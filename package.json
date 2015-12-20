@@ -1,9 +1,9 @@
 {
-  "name": "gulp-section",
+  "name": "gulp-magic-template",
   "version": "0.0.1",
-  "description": "Breaks a file up into parts by line",
+  "description": "Combines files magically using gulp",
   "license": "MIT",
-  "repository": "shadowmint/gulp-section",
+  "repository": "shadowmint/gulp-magic-template",
   "engines": {
     "node": ">=0.10.0"
   },

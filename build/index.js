@@ -13,6 +13,8 @@ var _gulpUtil2 = _interopRequireDefault(_gulpUtil);
 
 var _gulpTools = require('gulp-tools');
 
+var _pattern = require('./pattern');
+
 var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
@@ -31,7 +33,10 @@ var GulpPlugin = (function (_Plugin) {
   function GulpPlugin() {
     _classCallCheck(this, GulpPlugin);
 
-    return _possibleConstructorReturn(this, Object.getPrototypeOf(GulpPlugin).call(this, 'gulp-section'));
+    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(GulpPlugin).call(this, 'gulp-magic-template'));
+
+    _this.patterns = null;
+    return _this;
   }
 
   _createClass(GulpPlugin, [{
@@ -39,42 +44,35 @@ var GulpPlugin = (function (_Plugin) {
     value: function configure(options) {
       this.options = options ? options : {};
 
-      // The start pattern, or null to start from the start of the file.
-      this.option('start', null, function (v) {
-        return true;
-      });
+      // The set of patterns we expect to find
+      this.option('patterns');
 
-      // The end pattern, or null to end at the end of the file.
-      this.option('end', null, function (v) {
-        return true;
-      });
-
-      // The splitter to use; defaults to '\n'
-      this.option('split', '\n');
+      // The handler to invoke with the set of loaded pattern files
+      this.option('action');
     }
   }, {
     key: 'handle_string',
     value: function handle_string(file, value, callback) {
-      var lines = value.split(this.options.split);
-      var matches = [];
-      var reading = this.options.start == null;
-      for (var i = 0; i < lines.length; ++i) {
-        if (!reading) {
-          if (this.options.start.test(lines[i])) {
-            reading = true;
-          }
-        } else {
-          if (this.options.end !== null && this.options.end.test(lines[i])) {
-            break;
-          } else {
-            matches.push(lines[i]);
-          }
-        }
+
+      /// Create a new pattern config, if none exists
+      if (this.patterns == null) {
+        this.patterns = new _pattern.PatternGroup(this.options.patterns);
       }
 
-      // Rebind into file
-      file.contents = new Buffer(matches.join(this.options.split));
-      callback(null, file);
+      // Add to pattern group, if its a complete pattern, process it.
+      var pattern = this.patterns.process(file.path, value);
+      if (pattern) {
+        try {
+          var output = this.options.action(pattern.data);
+          file.contents = new Buffer(output);
+          callback(null, file);
+        } catch (err) {
+          var error = new _gulpUtil2.default.PluginError(this.name, err, { fileName: file.path });
+          callback(error);
+        }
+      } else {
+        callback();
+      }
     }
   }]);
 

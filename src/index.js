@@ -1,49 +1,48 @@
 import gutil from 'gulp-util';
 import {Plugin} from 'gulp-tools';
+import {PatternGroup} from './pattern';
 import path from 'path';
 
 class GulpPlugin extends Plugin {
 
   constructor() {
-    super('gulp-section');
+    super('gulp-magic-template');
+    this.patterns = null;
   }
 
   configure(options) {
     this.options = options ? options : {};
 
-    // The start pattern, or null to start from the start of the file.
-    this.option('start', null, (v) => { return true; });
+    // The set of patterns we expect to find
+    this.option('patterns');
 
-    // The end pattern, or null to end at the end of the file.
-    this.option('end', null, (v) => { return true; });
-
-    // The splitter to use; defaults to '\n'
-    this.option('split', '\n');
+    // The handler to invoke with the set of loaded pattern files
+    this.option('action');
   }
 
   handle_string(file, value, callback) {
-    var lines = value.split(this.options.split);
-    var matches = [];
-    var reading = this.options.start == null;
-    for (var i = 0; i < lines.length; ++i) {
-      if (!reading) {
-        if (this.options.start.test(lines[i])) {
-          reading = true;
-        }
-      }
-      else {
-        if ((this.options.end !== null) && (this.options.end.test(lines[i]))) {
-          break;
-        }
-        else {
-          matches.push(lines[i]);
-        }
-      }
+
+    /// Create a new pattern config, if none exists
+    if (this.patterns == null) {
+      this.patterns = new PatternGroup(this.options.patterns);
     }
 
-    // Rebind into file
-    file.contents = new Buffer(matches.join(this.options.split));
-    callback(null, file);
+    // Add to pattern group, if its a complete pattern, process it.
+    var pattern = this.patterns.process(file.path, value);
+    if (pattern) {
+      try {
+        var output = this.options.action(pattern.data);
+        file.contents = new Buffer(output);
+        callback(null, file);
+      }
+      catch(err) {
+        var error = new gutil.PluginError(this.name, err, {fileName: file.path});
+        callback(error);
+      }
+    }
+    else {
+      callback();
+    }
   }
 }
 
