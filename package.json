@@ -1,0 +1,29 @@
+{
+  "name": "gulp-section",
+  "version": "0.0.1",
+  "description": "Breaks a file up into parts by line",
+  "license": "MIT",
+  "repository": "shadowmint/gulp-section",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "files": [
+    "index.js",
+    "build"
+  ],
+  "keywords": [
+    "gulpplugin"
+  ],
+  "dependencies": {
+    "gulp-nodeunit": "git://github.com/shadowmint/gulp-nodeunit.git#0.0.3",
+    "gulp-tools": "git://github.com/shadowmint/gulp-tools.git#0.0.7",
+    "gulp-util": "^3.0.6"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.3.13",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^6.1.1",
+    "gulp-plumber": "^1.0.1",
+    "run-sequence": "^1.1.1"
+  }
+}
