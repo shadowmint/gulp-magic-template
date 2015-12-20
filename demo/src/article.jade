@@ -1,0 +1,23 @@
+--META--
+
+title = "Article 1"
+published = 2016-01-01T08:00:00+08:00
+
+--CONTENT--
+
+# {{ locals.self.title }}
+
+published {{formatDate locals.self.published day=numeric month=long year=numeric}}
+
+Some actual content goes here...
+
+* item 1
+* item 2
+* item 3
+
+--TEMPLATE--
+
+extend ../templates/master
+
+block pagecontent
+  != locals.content

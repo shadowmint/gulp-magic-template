@@ -5,85 +5,13 @@ var _createClass = (function () { function defineProperties(target, props) { for
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.PatternStream = exports.Pattern = undefined;
+exports.PatternStream = undefined;
+
+var _pattern = require('./pattern');
 
 var _token = require('./token');
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/** A pattern is a collection of tokens */
-
-var Pattern = exports.Pattern = (function () {
-
-  /** Create a new instance */
-
-  function Pattern() {
-    _classCallCheck(this, Pattern);
-
-    this.patterns = {};
-    this.tokens = {};
-  }
-
-  /**
-   * Add a bunch of required patterns to this instance
-   * @param patterns A hash of { id: regex, id2: regex, ... }
-   */
-
-  _createClass(Pattern, [{
-    key: 'required',
-    value: function required(patterns) {
-      //console.log("Setup pattern with: " + JSON.stringify(patterns));
-      for (var key in patterns) {
-        this.patterns[key] = patterns[key];
-      }
-    }
-
-    /** Try to match a token into this pattern */
-
-  }, {
-    key: 'match',
-    value: function match(token) {
-      for (var key in this.patterns) {
-        if (token.match(key, this.patterns[key])) {
-          this.tokens[key] = token.clone();
-          //console.log("The token was bound to: " + key);
-          return true;
-        }
-      }
-      return false;
-    }
-
-    /** Ready yet? */
-
-  }, {
-    key: 'ready',
-    value: function ready() {
-      //console.log(`Checking if a pattern is ready: ${JSON.stringify(this.patterns)}`);
-      for (var key in this.patterns) {
-        //console.log(`${key} -> ${this.tokens[key]}`);
-        if (!this.tokens[key]) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    /** Export this pattern as a data object */
-
-  }, {
-    key: 'data',
-    value: function data() {
-      var rtn = {};
-      for (var key in this.tokens) {
-        var token = this.tokens[key];
-        rtn[key] = { path: token.path, value: token.value };
-      }
-      return rtn;
-    }
-  }]);
-
-  return Pattern;
-})();
 
 /** A stream of patterns */
 
@@ -97,8 +25,8 @@ var PatternStream = exports.PatternStream = (function () {
     this.patterns = {};
     this.emitted = 0;
     this.discarded = 0;
-    this._globals = new Pattern();
-    this._instance = new Pattern();
+    this._globals = new _pattern.Pattern();
+    this._instance = new _pattern.Pattern();
   }
 
   /** Set the global required patterns */
@@ -149,7 +77,7 @@ var PatternStream = exports.PatternStream = (function () {
   }, {
     key: 'create_pattern',
     value: function create_pattern() {
-      var instance = new Pattern();
+      var instance = new _pattern.Pattern();
       instance.required(this._instance.patterns);
       instance.required(this._globals.patterns);
       for (var key in this._globals.tokens) {

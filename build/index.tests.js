@@ -29,21 +29,27 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function test_entire_file(test) {
   test.expect(1);
 
-  var files = [new _vinyl2.default({ path: 'foo/source1.json', cwd: 'tests/', base: 'tests/', contents: new Buffer("1") }), new _vinyl2.default({ path: 'foo/source2.json', cwd: 'tests/', base: 'tests/', contents: new Buffer("2") }), new _vinyl2.default({ path: 'foo/source1.html', cwd: 'tests/', base: 'tests/', contents: new Buffer("3") }), new _vinyl2.default({ path: 'foo/source2.html', cwd: 'tests/', base: 'tests/', contents: new Buffer("4") }), new _vinyl2.default({ path: 'foo/source1.jade', cwd: 'tests/', base: 'tests/', contents: new Buffer("5") }), new _vinyl2.default({ path: 'foo/source2.jade', cwd: 'tests/', base: 'tests/', contents: new Buffer("6") })];
+  var files = [new _vinyl2.default({ path: 'foo/globals.glob', cwd: 'tests/', base: 'tests/', contents: new Buffer("0") }), new _vinyl2.default({ path: 'foo/source1.json', cwd: 'tests/', base: 'tests/', contents: new Buffer("1") }), new _vinyl2.default({ path: 'foo/source2.json', cwd: 'tests/', base: 'tests/', contents: new Buffer("2") }), new _vinyl2.default({ path: 'foo/source1.html', cwd: 'tests/', base: 'tests/', contents: new Buffer("3") }), new _vinyl2.default({ path: 'foo/source2.html', cwd: 'tests/', base: 'tests/', contents: new Buffer("4") }), new _vinyl2.default({ path: 'foo/source1.jade', cwd: 'tests/', base: 'tests/', contents: new Buffer("5") }), new _vinyl2.default({ path: 'foo/source2.jade', cwd: 'tests/', base: 'tests/', contents: new Buffer("6") })];
 
   var stream = (0, _index2.default)({
+    globals: {
+      globals: /(.*)globals.glob$/
+    },
     patterns: {
       json: /(.*)\.json$/,
       jade: /(.*)\.jade$/,
       html: /(.*)\.html$/
     },
     action: function action(data) {
-      return '' + data.json.value + data.jade.value + data.html.value;
+      return '' + data.globals.value + data.json.value + data.jade.value + data.html.value;
+    },
+    path: function path(data) {
+      return data.json.path;
     }
   });
 
   sutils.read_from_stream(stream, 'utf-8', function (value) {
-    test.ok(value == "153264");
+    test.ok(value == "01530264");
     test.done();
   });
 
@@ -76,6 +82,9 @@ function test_with_stream(test) {
     },
     action: function action(data) {
       return '' + data.markdown.value + data.json.value;
+    },
+    path: function path(data) {
+      return data.json.path;
     }
   });
 

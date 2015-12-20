@@ -13,7 +13,11 @@ var _gulpUtil2 = _interopRequireDefault(_gulpUtil);
 
 var _gulpTools = require('gulp-tools');
 
-var _pattern = require('./pattern');
+var _pattern_stream = require('./pattern_stream');
+
+var _vinyl = require('vinyl');
+
+var _vinyl2 = _interopRequireDefault(_vinyl);
 
 var _path = require('path');
 
@@ -47,32 +51,50 @@ var GulpPlugin = (function (_Plugin) {
       // The set of patterns we expect to find
       this.option('patterns');
 
+      // The set of globals we expect to find
+      this.option('globals', null, function (v) {
+        return true;
+      });
+
       // The handler to invoke with the set of loaded pattern files
+      // The input is { key: token, key: token, ... }
+      // where token: { path: 'foo/source2.html', value: '...', uid: 'foo/source2', id: 'html' }
       this.option('action');
+
+      // The handler to invoke to generate the output path for complete files
+      // The input is { key: token, key: token, ... }
+      // where token: { path: 'foo/source2.html', value: '...', uid: 'foo/source2', id: 'html' }
+      this.option('path');
     }
   }, {
     key: 'handle_string',
-    value: function handle_string(file, value, callback) {
+    value: function handle_string(file, value, callback, fstream) {
 
       /// Create a new pattern config, if none exists
       if (this.patterns == null) {
-        this.patterns = new _pattern.PatternGroup(this.options.patterns);
+        this.patterns = new _pattern_stream.PatternStream();
+        this.patterns.instance(this.options.patterns);
+        if (this.options.globals) {
+          this.patterns.global(this.options.globals);
+        }
       }
 
-      // Add to pattern group, if its a complete pattern, process it.
-      var pattern = this.patterns.process(file.path, value);
-      if (pattern) {
-        try {
-          var output = this.options.action(pattern.data);
-          file.contents = new Buffer(output);
-          callback(null, file);
-        } catch (err) {
-          var error = new _gulpUtil2.default.PluginError(this.name, err, { fileName: file.path });
-          callback(error);
+      // Process a value
+      var results = this.patterns.handle(file.path, value);
+      var failed = null;
+      if (results) {
+        for (var i = 0; i < results.length; ++i) {
+          try {
+            var output = this.options.action(results[i].tokens);
+            var path = this.options.path(results[i].tokens);
+            var fp = new _vinyl2.default({ path: path, cwd: file.cwd, base: file.base, contents: new Buffer(output) });
+            fstream.push(fp);
+          } catch (err) {
+            failed = new _gulpUtil2.default.PluginError(this.name, err, { fileName: file.path });
+          }
         }
-      } else {
-        callback();
       }
+      callback(failed);
     }
   }]);
 

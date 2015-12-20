@@ -1,0 +1,11 @@
+site = "http://localhost/"
+title = "Demo"
+stylesheet = "./styles.css"
+
+[[link]]
+url = "www.google.com"
+title = "Google"
+
+[[link]]
+url = "www.facebook.com"
+title = "Facebook"

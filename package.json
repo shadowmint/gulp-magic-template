@@ -16,7 +16,7 @@
   ],
   "dependencies": {
     "gulp-nodeunit": "git://github.com/shadowmint/gulp-nodeunit.git#0.0.3",
-    "gulp-tools": "git://github.com/shadowmint/gulp-tools.git#0.0.7",
+    "gulp-tools": "git://github.com/shadowmint/gulp-tools.git#0.0.8",
     "gulp-util": "^3.0.6"
   },
   "devDependencies": {

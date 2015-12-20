@@ -13,6 +13,9 @@ See the `demo` folder for an example of this in practice.
 
 ```
 var stream = magic({
+  globals: {
+    global: /.*global.foo$/
+  },
   patterns: {
     txt: /(.*)\.txt$/,
     jade: /(.*)\.jade$/,
@@ -20,9 +23,72 @@ var stream = magic({
   },
   action: (data) => {
     return `${data.json.value}${data.jade.value}${data.html.value}`;
+  },
+  path: (data) => {
+    return data.json.path;
   }
 });
 ```
+
+### For example...
+
+You can render this:
+
+    --META--
+
+    title = "Article 1"
+    published = 2016-01-01T08:00:00+08:00
+
+    --CONTENT--
+
+    # {{ locals.self.title }}
+
+    published {{formatDate locals.self.published day=numeric month=long year=numeric}}
+
+    Some actual content goes here...
+
+    * item 1
+    * item 2
+    * item 3
+
+    --TEMPLATE--
+
+    extend ../templates/master
+
+    block pagecontent
+      != locals.content
+
+Into this:
+
+    <!DOCTYPE html>
+    <head>
+      <title>Demo</title>
+      <link rel="stylesheet" type="text/css" href="./styles.css">
+    </head>
+    <body class="default default">
+      <h1 id="-locals-self-title-">Article 1</h1>
+      <p>published 1/1/2016</p>
+      <p>Some actual content goes here...</p>
+      <ul>
+      <li>item 1</li>
+      <li>item 2</li>
+      <li>item 3</li>
+      </ul>
+      <div class="footer">
+        <div>
+          <a href="www.google.com">Google</a>
+        </div>
+        <div>
+          <a href="www.facebook.com">Facebook</a>
+        </div>
+      </div>
+    </body>
+    </html>
+
+Notice how the toml, markdown and jade are split out and then individually
+processed, then recombined into a single file.
+
+See the `demo` folder to see how this is done.
 
 ### Patterns
 
@@ -46,13 +112,9 @@ from the files which were matched, eg:
       html: { path: 'foo/source1.html', value: '1' },
       jade: { path: 'foo/source1.jade', value: '1' } }
 
-The return value is taken and used to replace the buffer on the final matching
-file.
-
 Notice that this plugin will only generate *one* output file, for a complete
 input file set; partial file sets are discarded, and each complete set will
-have whatever the final matching token is passed out as the file; use
-gulp-rename to ensure your final output file has the correct name.
+emit with a single filename based off the `path` option.
 
 ## Install
 

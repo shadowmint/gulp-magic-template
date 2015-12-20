@@ -1,0 +1,24 @@
+block locals
+block vars
+    -var viewclass = 'default';
+    -var template = 'default';
+
+doctype html
+
+head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge,chrome=1')
+    meta(name='viewport', content='width=device-width,initial-scale=1.0')
+    title
+      =locals.global.title
+    link(rel="stylesheet", type="text/css", href=locals.global.stylesheet)
+
+body(class="#{viewclass} #{template}")
+    block pagecontent
+    block footer
+      div.footer
+        each val in locals.global.link
+          div
+            a(href=val.url)
+              = val.title
+|</html>

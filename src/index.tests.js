@@ -9,6 +9,7 @@ export function test_entire_file(test) {
   test.expect(1);
 
   var files = [
+    new File({ path: 'foo/globals.glob', cwd: 'tests/', base: 'tests/', contents: new Buffer("0") }),
     new File({ path: 'foo/source1.json', cwd: 'tests/', base: 'tests/', contents: new Buffer("1") }),
     new File({ path: 'foo/source2.json', cwd: 'tests/', base: 'tests/', contents: new Buffer("2") }),
     new File({ path: 'foo/source1.html', cwd: 'tests/', base: 'tests/', contents: new Buffer("3") }),
@@ -18,18 +19,20 @@ export function test_entire_file(test) {
   ];
 
   var stream = plugin({
+    globals: {
+      globals: /(.*)globals.glob$/,
+    },
     patterns: {
       json: /(.*)\.json$/,
       jade: /(.*)\.jade$/,
       html: /(.*)\.html$/
     },
-    action: (data) => {
-      return `${data.json.value}${data.jade.value}${data.html.value}`;
-    }
+    action: (data) => { return `${data.globals.value}${data.json.value}${data.jade.value}${data.html.value}`; },
+    path: (data) => { return data.json.path; }
   });
 
   sutils.read_from_stream(stream, 'utf-8', function(value) {
-    test.ok(value == "153264");
+    test.ok(value == "01530264");
     test.done();
   });
 
@@ -62,7 +65,8 @@ export function test_with_stream(test) {
     },
     action: (data) => {
       return `${data.markdown.value}${data.json.value}`;
-    }
+    },
+    path: (data) => { return data.json.path; }
   });
 
   sutils.read_from_stream(stream, 'utf-8', function(value) {
