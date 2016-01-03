@@ -134,6 +134,31 @@ the number of incomplete patterns at the end of the run, the number of
 paths that were discarded as matching no token, and the number of complete
 patterns emitted.
 
+### Conflicts...
+
+Notice that patterns will greedily consume tokens that match them, so a config
+like this:
+
+    patterns: {
+      html: /(.*)\.html/,
+      json: /(.*)\.json/
+    },
+    globals: {
+      global: /(.*)globals\.json$/
+    }
+
+Will never work; the pattern will consume the global as a 'json' token, resulting
+in no complete patterns ever being emitted. You should use regex patterns which
+are unique in each slot, eg.
+
+    patterns: {
+      html: /(.*)content(.*)\.html/,
+      json: /(.*)content(.*)\.json/
+    },
+    globals: {
+      global: /(.*)globals(.*)globals\.json$/
+    }
+
 ## Install
 
 ```
