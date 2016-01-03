@@ -1,6 +1,6 @@
 {
   "name": "gulp-magic-template",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Combines files magically using gulp",
   "license": "MIT",
   "repository": "shadowmint/gulp-magic-template",

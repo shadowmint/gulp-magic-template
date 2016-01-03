@@ -26,6 +26,9 @@ var stream = magic({
   },
   path: (data) => {
     return data.json.path;
+  },
+  debug: (data) => {
+    console.log(data);
   }
 });
 ```
@@ -115,6 +118,21 @@ from the files which were matched, eg:
 Notice that this plugin will only generate *one* output file, for a complete
 input file set; partial file sets are discarded, and each complete set will
 emit with a single filename based off the `path` option.
+
+### Debug
+
+The debug option can be used to debug the process, it returns a block like
+this on the handler:
+
+    { globals: { matched: 1, total: 1 },
+      incomplete: 0,
+      discarded: 0,
+      emitted: 2 }
+
+Which are, respectively, the number of global tokens required and found,
+the number of incomplete patterns at the end of the run, the number of
+paths that were discarded as matching no token, and the number of complete
+patterns emitted.
 
 ## Install
 

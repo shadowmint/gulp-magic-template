@@ -28,7 +28,8 @@ export function test_entire_file(test) {
       html: /(.*)\.html$/
     },
     action: (data) => { return `${data.globals.value}${data.json.value}${data.jade.value}${data.html.value}`; },
-    path: (data) => { return data.json.path; }
+    path: (data) => { return data.json.path; },
+    debug: (data) => { console.log(data); }
   });
 
   sutils.read_from_stream(stream, 'utf-8', function(value) {

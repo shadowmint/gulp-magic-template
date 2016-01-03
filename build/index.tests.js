@@ -45,6 +45,9 @@ function test_entire_file(test) {
     },
     path: function path(data) {
       return data.json.path;
+    },
+    debug: function debug(data) {
+      console.log(data);
     }
   });
 

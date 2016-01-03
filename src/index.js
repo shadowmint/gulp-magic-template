@@ -29,6 +29,10 @@ class GulpPlugin extends Plugin {
     // The input is { key: token, key: token, ... }
     // where token: { path: 'foo/source2.html', value: '...', uid: 'foo/source2', id: 'html' }
     this.option('path');
+
+    // This handler is invoked with debug information at the end of the process
+    // Use this if things seem to be going strange.
+    this.option('debug', null, (v) => { return true; });
   }
 
   handle_string(file, value, callback, fstream) {
@@ -59,6 +63,14 @@ class GulpPlugin extends Plugin {
       }
     }
     callback(failed);
+  }
+
+  /** Emit debug information on close */
+  handle_close(fstream, callback) {
+    if (this.options.debug) {
+      this.options.debug(this.patterns.debug());
+    }
+    callback();
   }
 }
 
